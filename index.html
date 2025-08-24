@@ -53,12 +53,18 @@
       0 0 15px cyan;
     }
     .qr-img {
-      width: 200px; height: 200px;
-      margin: 10px auto;
-      border: 1px solid cyan;
-      border-radius: 10px;
-      box-shadow: 0 0 15px cyan;
-    }
+  width: 90%;          /* hampir full lebar */
+  max-width: 400px;    /* batas maksimal di desktop */
+  height: auto;        /* otomatis menyesuaikan tinggi */
+  margin: 10px auto;
+  border: 1px solid cyan;
+  border-radius: 10px;
+  box-shadow: 
+    0 0 5px cyan
+    0 0 10px cyan
+    0 0 15px cyan;
+  display: block;
+      }
   </style>
 </head>
 <body>
@@ -112,9 +118,9 @@
 
   <script>
     // KONFIG EMAILJS
-    const SERVICE_ID = "YOUR_SERVICE_ID";
-    const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-    const PUBLIC_KEY  = "YOUR_PUBLIC_KEY";
+    const SERVICE_ID = "service_rxj53np";
+    const TEMPLATE_ID = "template_we7gml9";
+    const PUBLIC_KEY  = "832fKv_GgI-apbZdD";
 
     emailjs.init(PUBLIC_KEY);
 
