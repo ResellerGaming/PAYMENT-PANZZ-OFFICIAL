@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment - PANZZ OFFICIAL</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+    }
+    .hidden { display: none; }
+    .card {
+      background: rgba(20,20,20,0.8);
+      border: 1px solid cyan;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 400px;
+      margin: 20px auto;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border: 1px solid cyan;
+      border-radius: 10px;
+      background: #111;
+      color: cyan;
+    }
+    input:focus { outline: none; box-shadow: 0 0 10px cyan; }
+    button {
+      background: #0ff3;
+      border: 1px solid cyan;
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: cyan;
+      color: black;
+      box-shadow: 
+      0 0 5px cyan,
+      0 0 10px cyan,
+      0 0 15px cyan;
+    }
+    .qr-img {
+      width: 200px; height: 200px;
+      margin: 10px auto;
+      border: 1px solid cyan;
+      border-radius: 10px;
+      box-shadow: 0 0 15px cyan;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Halaman Welcome -->
+  <div id="welcome">
+    <h1>Welcome to Payment <span style="color:cyan">PANZZ OFFICIAL</span></h1>
+    <button onclick="gotoForm()">Lanjut Pembayaran</button>
+  </div>
+
+  <!-- Halaman Form -->
+  <div id="formPage" class="hidden">
+    <div class="card">
+      <h2>Form Pembayaran</h2>
+      <form id="paymentForm">
+        <input type="text" name="sender_name" id="sender_name" placeholder="Nama Pengirim" required />
+
+        <select name="method" id="method" required>
+          <option value="">-- Pilih Metode --</option>
+          <option value="dana">DANA</option>
+          <option value="gopay">GoPay</option>
+          <option value="seabank">SeaBank</option>
+          <option value="qris">QRIS</option>
+        </select>
+
+        <div id="details" class="hidden">
+          <p><b>Atas Nama:</b> <span id="accountName"></span></p>
+          <p id="accNumberRow"><b>No Rekening:</b> <span id="accountNumber"></span></p>
+          <img id="qrImg" class="qr-img hidden" src="" alt="QRIS"/>
+        </div>
+
+        <input type="file" name="bukti" id="bukti" accept="image/*" required />
+
+        <button type="submit">Lanjut</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Halaman Struk -->
+  <div id="receiptPage" class="hidden">
+    <div class="card">
+      <h2>Struk Pembayaran</h2>
+      <p><b>Nama Pengirim:</b> <span id="rName"></span></p>
+      <p><b>Metode:</b> <span id="rMethod"></span></p>
+      <p><b>No Rekening:</b> <span id="rNumber"></span></p>
+      <p><b>Atas Nama:</b> <span id="rAccName"></span></p>
+      <p><b>Waktu:</b> <span id="rTime"></span></p>
+      <button onclick="gotoHome()">Kembali</button>
+    </div>
+  </div>
+
+  <script>
+    // KONFIG EMAILJS
+    const SERVICE_ID = "YOUR_SERVICE_ID";
+    const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+    const PUBLIC_KEY  = "YOUR_PUBLIC_KEY";
+
+    emailjs.init(PUBLIC_KEY);
+
+    const methods = {
+      dana: {name: "MUR** LES**", number: "085213061778"},
+      gopay: {name: "Taufan", number: "0881025468735"},
+      seabank: {name: "MUR** LES**", number: "901595852988"},
+      qris: {name: "PT Toko Maju Jaya", number: "-", qr: "https://d.uguu.se/KtotMmjf.jpg"} // ganti qris.png dengan file QR Anda
+    };
+
+    function gotoForm(){
+      document.getElementById("welcome").classList.add("hidden");
+      document.getElementById("formPage").classList.remove("hidden");
+    }
+
+    function gotoHome(){
+      document.getElementById("receiptPage").classList.add("hidden");
+      document.getElementById("welcome").classList.remove("hidden");
+    }
+
+    document.getElementById("method").addEventListener("change", function(){
+      const val = this.value;
+      if(!val) return;
+      const det = methods[val];
+      document.getElementById("details").classList.remove("hidden");
+      document.getElementById("accountName").innerText = det.name;
+      document.getElementById("accountNumber").innerText = det.number;
+      if(val === "qris"){
+        document.getElementById("accNumberRow").classList.add("hidden");
+        document.getElementById("qrImg").classList.remove("hidden");
+        document.getElementById("qrImg").src = det.qr;
+      } else {
+        document.getElementById("accNumberRow").classList.remove("hidden");
+        document.getElementById("qrImg").classList.add("hidden");
+      }
+    });
+
+    document.getElementById("paymentForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const senderName = document.getElementById("sender_name").value;
+      const method = document.getElementById("method").value;
+      const det = methods[method];
+
+      // Kirim via EmailJS (tanpa attachment preview)
+      emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
+        .then(() => {
+          // Tampilkan struk
+          document.getElementById("formPage").classList.add("hidden");
+          document.getElementById("receiptPage").classList.remove("hidden");
+          document.getElementById("rName").innerText = senderName;
+          document.getElementById("rMethod").innerText = method.toUpperCase();
+          document.getElementById("rNumber").innerText = det.number;
+          document.getElementById("rAccName").innerText = det.name;
+          document.getElementById("rTime").innerText = new Date().toLocaleString();
+        }, (err) => {
+          alert("Gagal mengirim data: " + JSON.stringify(err));
+        });
+    });
+  </script>
+</body>
+<footer style="margin:40px 0; text-align:center; font-size:12px; color:cyan; opacity:0.7;">
+  © 2025 Reseller Gaming Programmer. All rights reserved.
+</footer>
+  </html>
