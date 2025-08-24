@@ -161,43 +161,6 @@
       document.getElementById("welcome").classList.remove("hidden");
     }
 
-    // ====== Image compression & size check ======
-let proofBase64 = "";
-
-document.getElementById("proofFile").addEventListener("change", function () {
-  const file = this.files[0];
-  if (!file) return;
-  compressImage(file, 400, 0.5, (b64) => {
-    // hitung size base64
-    const sizeKB = Math.round((b64.length * 3) / 4 / 1024);
-    if (sizeKB > 50) {
-      alert("Bukti terlalu besar walau sudah di-compress. Coba upload screenshot lebih kecil.");
-      proofBase64 = "";
-    } else {
-      proofBase64 = b64;
-      console.log("Compressed Proof Size:", sizeKB, "KB");
-    }
-  });
-});
-
-function compressImage(file, maxSize = 400, quality = 0.5, cb){
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      let { width, height } = img;
-      if (width > height && width > maxSize){ height *= maxSize / width; width = maxSize; }
-      else if (height > width && height > maxSize){ width *= maxSize / height; height = maxSize; }
-      const canvas = document.createElement("canvas");
-      canvas.width = width; canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-      cb(canvas.toDataURL("image/jpeg", quality));
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-    }
 
     document.getElementById("method").addEventListener("change", function(){
       const val = this.value;
