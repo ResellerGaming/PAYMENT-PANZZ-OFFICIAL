@@ -3,49 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Reseller Gaming</title>
+  <title>Payment PANZZ OFFICIAL</title>
   <style>
     body {
-      background: #000;
+      background: linear-gradient(135deg, #000 30%, #001f2b 100%);
       color: cyan;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       text-align: center;
     }
     .hidden { display: none; }
     .container {
-      max-width: 400px;
+      max-width: 420px;
       margin: 40px auto;
       padding: 20px;
       border: 1px solid cyan;
-      border-radius: 15px;
-      box-shadow: 0 0 20px cyan;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 25px cyan;
+      animation: fadeIn 0.6s ease;
     }
     input, select, button {
       width: 90%;
       margin: 10px auto;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid cyan;
       background: #111;
       color: cyan;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 0 12px cyan;
     }
     button {
       cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 0 10px cyan;
+      box-shadow: 0 0 15px cyan;
+      background: linear-gradient(135deg, #00ffff, #007d7d);
+      color: #000;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
     }
     .qr-img {
       width: 90%;
-      height: auto;
-      margin: 10px auto;
+      margin: 15px auto;
       border: 1px solid cyan;
-      border-radius: 10px;
-      box-shadow: 0 0 15px cyan;
+      border-radius: 12px;
+      box-shadow: 0 0 20px cyan;
     }
+
+    /* ==== Receipt (Struk) ==== */
+    #receiptPage {
+      text-align: center;
+    }
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      margin: 15px auto;
+      border-radius: 50%;
+      background: #00ffaa33;
+      border: 3px solid #00ffaa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pop 0.6s ease;
+    }
+    .success-icon::before {
+      content: "✔";
+      font-size: 40px;
+      color: #00ffaa;
+      font-weight: bold;
+    }
+    .receipt-box {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 15px;
+      background: rgba(0,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.3);
+      text-align: left;
+      font-size: 14px;
+      color: #bff;
+    }
+    .receipt-box p {
+      margin: 6px 0;
+    }
+
     footer {
       margin-top: 20px;
       font-size: 12px;
       color: #0ff;
+      opacity: 0.7;
+    }
+
+    /* Animasi */
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
@@ -53,13 +114,14 @@
   <!-- Halaman Welcome -->
   <div id="welcome" class="container">
     <h2>Welcome to Payment</h2>
-    <h3>Reseller Gaming</h3>
+    <h3>PANZZ OFFICIAL</h3>
     <button onclick="gotoForm()">Lanjut Pembayaran</button>
   </div>
 
   <!-- Halaman Form -->
   <div id="formPage" class="container hidden">
-    <h3>Form Pembayaran</h3>
+    <h2>Form Pembayaran</h2>
+    <h3>PANZZ OFFICIAL</h3>
     <input type="text" id="senderName" placeholder="Nama Pengirim" required>
     <select id="method" required>
       <option value="">-- Pilih Metode Pembayaran --</option>
@@ -81,9 +143,15 @@
 
   <!-- Struk -->
   <div id="receiptPage" class="container hidden">
-    <h3>Pembayaran Terkirim!</h3>
+    <div class="success-icon"></div>
+    <h3>Pembayaran Berhasil!</h3>
     <p>Terima kasih, pembayaran Anda sedang diproses.</p>
-    <button onclick="gotoHome()">Kembali</button>
+    
+    <div class="receipt-box" id="receiptDetails">
+      <!-- Info struk akan diisi via JS -->
+    </div>
+
+    <button onclick="gotoHome()">Kembali ke Home</button>
   </div>
 
   <footer>
@@ -92,14 +160,14 @@
 
   <script>
     // ================= CONFIG TELEGRAM =================
-    const BOT_TOKEN = "8327674365:AAF-o2v-wQbbV03eYd9wGsuRO4PUSY0XSek";   // token bot
-    const CHAT_ID  = "7829503755";     // <- ganti chat id
+    const BOT_TOKEN = "8327674365:AAF-o2v-wQbbV03eYd9wGsuRO4PUSY0XSek";   
+    const CHAT_ID  = "7829503755";     
 
     const methods = {
       dana:    {name: "MUR** LE5**", number: "085213061778"},
       gopay:   {name: "Taufan", number: "0881025468735"},
       seabank: {name: "MUR** LE5**", number: "901595852988"},
-      qris:    {name: "PT Toko Maju Jaya", number: "-", qr: "IMG_QRIS.jpg"}
+      qris:    {name: "Warung Seblak", number: "-", qr: "qris.jpg"}
     };
 
     let proofBase64 = "";
@@ -192,10 +260,19 @@
         });
       }
 
-      // pindah ke halaman struk
+      // tampilkan struk
       document.getElementById("formPage").classList.add("hidden");
       document.getElementById("receiptPage").classList.remove("hidden");
+
+      // isi detail struk
+      document.getElementById("receiptDetails").innerHTML = `
+        <p><b>Nama Pengirim:</b> ${name}</p>
+        <p><b>Metode:</b> ${methodKey.toUpperCase()}</p>
+        <p><b>Atas Nama:</b> ${det.name}</p>
+        ${methodKey !== "qris" ? `<p><b>No Rek/HP:</b> ${det.number}</p>` : ""}
+        <p><b>Status:</b> <span style="color:lime">Sedang Diproses ✅</span></p>
+      `;
     }
   </script>
 </body>
-    </html>
+  </html>
